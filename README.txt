@@ -1,0 +1,2 @@
+NBA Trade Evaluator 
+My first real project. Thought of it after the trade that shocked the entire world when Luka Doncic got traded to the Los Angelos Lakers. Thought, that's got to be a terrible trade for Dallas, right? Then it occurred to me, why not develop a simple program that rates potential NBA trades and decides who's most likely won the trade. 

@@ -1,0 +1,29 @@
+Trade Criteria: 
+Factors to be considered for the player: 
+- avg box +/- 
+- salary/contract situation (how likely is the player to resign?) 
+- age (prime being 27-31)
+
+Factors to be considered for the franchise: 
+- recent playoff history 
+- assets to be traded 
+- salary cap 
+- regular season record 
+- realistic playoff contention chances
+
+Player Value will be judged by a variable known as the Star Value that takes into consideration:
+i.) BPM (box +/-)
+ii.)Salary (in millions of $) 
+iii.) Age
+The Star Value system will categorize NBA players into different tiers based on their BPM percentile in the league. 
+The formula is  SV=BPM×(1+α×f(Age , BPM Percentile))
+where : 
+	f(Age, BPM Percentile) = Age factor that decreases for older players unless they are in the top percentiles of BPM
+	α = Scaling factor to adjust the impact of age (tuned based on testing)
+
+This done so as to not penalize the young superstars of the league in the Top 5% of BPM (like Luka Doncic)  for their age.
+The tiers are done as follows:
+	- Top 5%  BPM (Superstars)   -> minimal age penalty applied
+	- 5%-25%  BPM (All-Stars)    -> mild age penalty applied
+	- 25%-50% BPM (Role Players) -> moderate age penalty applied
+	- <50% BPM (Bench/Rotation)  -> strong age penalty applied
