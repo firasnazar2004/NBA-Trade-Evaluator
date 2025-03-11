@@ -6,15 +6,11 @@ from basketball_reference_scraper.players import get_stats
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
 from nba_api.stats.endpoints import LeagueStandings, TeamYearByYearStats
-
-file_path = "database_24_25.csv"
-
-# Load the latest version
-df = kagglehub.load_dataset(
-  KaggleDatasetAdapter.PANDAS,
-  "eduardopalmieri/nba-player-stats-season-2425",
-  file_path)
-path = kagglehub.dataset_download("jamiewelsh2/nba-player-salaries-2022-23-season")
+import requests
+url = "https://stats.nba.com/stats/scoreboard/?GameDate=02/10/2025"
+headers = {"User-Agent": "Mozilla/5.0"}
+response = requests.get(url, headers=headers)
+print(response.status_code)
 
 
 

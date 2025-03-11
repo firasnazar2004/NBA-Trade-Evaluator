@@ -1,6 +1,7 @@
 import pandas as pd 
 import numpy as np
 from nba_api.stats.endpoints import PlayerCareerStats , PlayerGameLog
+from nba_api.stats.static import players
 from idGetter import get_player_id
 
 
@@ -11,6 +12,31 @@ c= 0.35
 d= 1
 e = 0.9
 f = 0.7
+def get_all_bpm():
+    all_players = players.get_players()
+    players_bpm_list = []
+    
+    for player in all_players:
+        player_name = player['full_name']
+        bpm = get_bpm(player_name)
+        if bpm is not None:
+            players_bpm_list.append((player_name,bpm))
+    return pd.DataFrame(players_bpm_list, columns=['Player','BPM'])
+
+
+def get_percentile_ranking(player_name,bpm_df):
+    bpm_df = bpm_df.sort_values(by='BPM' , ascending=False).reset_index(drop=True)
+    bpm_df['Rank'] = bpm_df.index + 1 
+    bpm_df['Percentile'] =bpm_df['Rank'] / len(bpm_df) * 100 
+    player_row = bpm_df[bpm_df['Player']==player_name]
+    
+    if player_row.empty:
+        return None,None
+    
+    player_rank = int(player_row['Rank'].values[0])
+    player_percentile = float(player_row['Percentile'].values[0])
+
+    return player_rank, player_percentile
 
 def calculate_bpm(points, rebounds , assists, steals, blocks, turnovers, minutes):
     if minutes == 0:
@@ -47,3 +73,7 @@ def get_bpm(playerName):
             print(f"Error fetching player stats: {e}")
     else:
         print("Player not found.")
+
+bpm_df = get_all_bpm()
+player_name = 'lebron'
+rank, percentile = get_percentile_ranking(player_name, bpm_df)
