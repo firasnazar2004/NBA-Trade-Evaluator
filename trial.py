@@ -1,14 +1,21 @@
 import requests
 import time
 
+# HEADERS = {
+#     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+#     "Accept": "application/json, text/plain, */*",
+#     "Accept-Encoding": "gzip, deflate, br",
+#     "Connection": "keep-alive",
+#     "Host": "stats.nba.com"
+# }
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.15; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15",
+    "Accept-Language": "en-US,en;q=0.9",
     "Accept": "application/json, text/plain, */*",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Connection": "keep-alive",
-    "Host": "stats.nba.com"
+    "Origin": "https://www.nba.com",
+    "Referer": "https://www.nba.com/",
+    "Connection": "keep-alive"
 }
-
 def get_player_stats(player_id, season="2024-25", retries=3):
     url = f"https://stats.nba.com/stats/playergamelog?PlayerID={player_id}&Season={season}&SeasonType=Regular%20Season"
     

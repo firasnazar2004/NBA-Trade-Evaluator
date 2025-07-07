@@ -3,7 +3,7 @@ import numpy as np
 from nba_api.stats.endpoints import PlayerCareerStats , PlayerGameLog
 from nba_api.stats.static import players
 from idGetter import get_player_id
-
+import time
 
 #Simplified coefficients from ChatGpt that are based on historical BPM models
 a = 0.25
@@ -16,11 +16,12 @@ def get_all_bpm():
     all_players = players.get_players()
     players_bpm_list = []
     
-    for player in all_players:
+    for player in all_players[:50]:
         player_name = player['full_name']
         bpm = get_bpm(player_name)
         if bpm is not None:
             players_bpm_list.append((player_name,bpm))
+            time.sleep(2)
     return pd.DataFrame(players_bpm_list, columns=['Player','BPM'])
 
 
