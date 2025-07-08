@@ -18,10 +18,12 @@ def get_all_bpm():
     
     for player in all_players[:50]:
         player_name = player['full_name']
+        print(f"Checking BPM for: {player_name}")
         bpm = get_bpm(player_name)
         if bpm is not None:
             players_bpm_list.append((player_name,bpm))
             time.sleep(2)
+            print(f"Collected BPMs for {len(players_bpm_list)}")
     return pd.DataFrame(players_bpm_list, columns=['Player','BPM'])
 
 
@@ -76,5 +78,5 @@ def get_bpm(playerName):
         print("Player not found.")
 
 bpm_df = get_all_bpm()
-player_name = 'lebron'
+player_name = 'alaa'
 rank, percentile = get_percentile_ranking(player_name, bpm_df)

@@ -9,10 +9,14 @@ def get_player_id(player_name, threshold=80):
     best_match , score = process.extractOne(player_name, player_names.keys())
 
     if score>= threshold:
+        print(f"Input: {player_name}")
+        print(f"Best match: {best_match} with score {score}")
         return player_names[best_match]
+        
     else:
         return None
 
+    
 def get_team_id(team_name, threshold=80): 
     all_teams = teams.get_teams()
     team_names = {team['full_name']: team['id'] for team in all_teams}
