@@ -5,6 +5,7 @@ from nba_api.stats.static import players
 from idGetter import get_player_id
 import time
 
+
 #Simplified coefficients from ChatGpt that are based on historical BPM models
 a = 0.25
 b= 0.3 
@@ -13,10 +14,10 @@ d= 1
 e = 0.9
 f = 0.7
 def get_all_bpm():
-    all_players = players.get_players()
+    all_players = players.get_active_players()
     players_bpm_list = []
     
-    for player in all_players[:50]:
+    for player in all_players[:500]:
         player_name = player['full_name']
         print(f"Checking BPM for: {player_name}")
         bpm = get_bpm(player_name)
@@ -78,5 +79,5 @@ def get_bpm(playerName):
         print("Player not found.")
 
 bpm_df = get_all_bpm()
-player_name = 'alaa'
+player_name = 'lebron'
 rank, percentile = get_percentile_ranking(player_name, bpm_df)

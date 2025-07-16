@@ -1,6 +1,6 @@
 import sys
-import pandas as pd
-sys.path.append(r"E:\Firas Main Library\Projects\NBA-TRADE-EVAULATOR\nba_env\Lib\site-packages")
+# import pandas as pd
+sys.path.append("/Users/firasnazar/Main Library/Coding/Projects/NbaTradeEvaluator/NBA-Trade-Evaluator/nba_env/lib/python3.13/site-packages")
 from sportsipy.nba.roster import Player
 from basketball_reference_scraper.players import get_stats
 import kagglehub
