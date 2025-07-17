@@ -7,12 +7,14 @@ import time
 
 
 #Simplified coefficients from ChatGpt that are based on historical BPM models
-a = 0.25
-b= 0.3 
-c= 0.35 
+a = 0.22
+b= 0.28 
+c= 0.32 
 d= 1
-e = 0.9
+e = 0.85
 f = 0.7
+g = 10
+h = 7
 def get_all_bpm():
     all_players = players.get_active_players()
     players_bpm_list = []
@@ -42,7 +44,7 @@ def get_percentile_ranking(player_name,bpm_df):
 
     return player_rank, player_percentile
 
-def calculate_bpm(points, rebounds , assists, steals, blocks, turnovers, minutes):
+def calculate_bpm(points, rebounds , assists, steals, blocks, turnovers, minutes, fg_pct, three_pct):
     if minutes == 0:
         return 0
     
@@ -51,7 +53,11 @@ def calculate_bpm(points, rebounds , assists, steals, blocks, turnovers, minutes
            c * assists + 
            d* steals +
            e * blocks - 
-           f * turnovers) / minutes *36
+           f * turnovers + 
+           g * fg_pct + 
+           h * three_pct
+           
+           ) / minutes *36
     return round(bpm,2)
 
 
