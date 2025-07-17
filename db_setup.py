@@ -144,6 +144,7 @@ def year_to_season(year):
 
 
 stats_df = pd.read_csv(os.path.join(path, 'NBA Player Stats and Salaries_2010-2025.csv'))
+contracts_df= pd.read_csv(os.path.join(path, 'NBA Player Stats and Salaries_2010-2025.csv'))
 
 player_id_map = {}
 
@@ -185,6 +186,18 @@ cur.executemany("""
                  rebounds, assists, steals, blocks, turnovers, minutes, "FG%", "3P%")
                 VALUES (?,?,?,?,?,?,?,?,?,?,?)
                 """ ,stats_data)
+
+
+contracts_df['salary'] = (
+    contracts_df['salary']
+    .replace('[\$,]', '', regex=True)  
+    .astype(float)
+    .fillna(0)                         
+    .astype(int)
+)
+contracts_df = contracts_df[['player_id' , 'season' , 'salary']].dropna()
+
+
 conn.commit()
 conn.close()
 
