@@ -122,52 +122,35 @@ cur.execute("""
 
             """)
 cur.execute("""
-    CREATE TABLE  contracts (
+    CREATE TABLE contracts (
         player_id INTEGER,
-        season TEXT,
-        salary INTEGER,
-        years_remaining INTEGER,
-        is_restricted BOOLEAN,
-        is_max_contract BOOLEAN,
-        PRIMARY KEY (player_id, season)
+        player_name TEXT,
+        avg_annual_salary INTEGER,
+        contract_salary INTEGER,
+        contract_start_year INTEGER,
+        contract_end_year INTEGER,
+        contract_duration INTEGER,
+        remaining_years INTEGER,
+        PRIMARY KEY (player_id)
     )
 """)
 
-"""
-CREATE TABLE contracts ( 
+cur.executemany("""
+  INSERT OR IGNORE INTO teams (team_id, team_name, team_abbreviation, conference)
+  VALUES (?, ?, ?, ?)
+ """, team_data)
 
-    player_id INTEGER, 
-    avg_annual_salary INTEGER,
-    contract_duration INTEGER, 
-    remaining_years INTEGER,
-    
-
-
-
-)
-
-
-
-
-
-"""
-
-# cur.executemany("""
-#  INSERT OR IGNORE INTO teams (team_id, team_name, team_abbreviation, conference)
-#  VALUES (?, ?, ?, ?)
-# """, team_data)
-
-# for p in all_players:
-#     cur.execute("""
-#         INSERT OR REPLACE INTO players (id, full_name, is_active, team_id)
-#         VALUES (?, ?, ?, ?)
-#     """, (p['id'], p['full_name'], p['is_active'], p.get('team_id')))
+for p in all_players:
+     cur.execute("""
+         INSERT OR REPLACE INTO players (id, full_name, is_active, team_id)
+         VALUES (?, ?, ?, ?)
+     """, (p['id'], p['full_name'], p['is_active'], p.get('team_id')))
 def year_to_season(year):
     return f"{year - 1}-{str(year)[-2:]}"
 
 
 stats_df = pd.read_csv(os.path.join(path, 'NBA Player Stats and Salaries_2010-2025.csv'))
-contracts_df= pd.read_csv(os.path.join(path, 'NBA Player Stats and Salaries_2010-2025.csv'))
+
 
 player_id_map = {}
 
@@ -211,6 +194,9 @@ cur.executemany("""
                 """ ,stats_data)
 
 
+contracts_csv_path = "/Users/firasnazar/Main Library/Coding/Projects/nba_assets/nba_top_100_contracts.csv"
+contracts_df = pd.read_csv(contracts_csv_path)
+
 contracts_df['Average Annual Salary'] = (
     contracts_df['Average Annual Salary']
     .replace('[\$,]', '', regex=True)  
@@ -218,6 +204,40 @@ contracts_df['Average Annual Salary'] = (
     .fillna(0)                         
     .astype(int)
 )
+contracts_df['Contract Salary']= (
+    contracts_df['Contract Salary']
+    .replace('[\$,]', '', regex=True)
+    .astype(float)
+    .fillna(0)
+    .astype(int)
+)
+
+contracts_data =[]
+for _, row in contracts_df.iterrows():
+    player_name = row['Player Name']
+
+    if player_name not in player_id_map:
+        continue
+    
+    player_id = player_id_map[player_name]
+    contracts_data.append((
+        player_id,
+        player_name,
+        row['Average Annual Salary'],
+        row['Contract Salary'],
+        row['Contract Start Year'],
+        row['Contract End Year'],
+        row['Contract Duration'],
+        row.get('Years Remaining', 0)  
+    )
+    )
+
+cur.executemany("""
+    INSERT OR REPLACE INTO contracts (player_id, player_name, avg_annual_salary, 
+    contract_salary, contract_start_year, contract_end_year, contract_duration, remaining_years)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+""", contracts_data)
+
 
 contracts_df['Years Remaining'] = contracts_df['Contract Duration'].fillna(0).astype(int)   
 
