@@ -5,7 +5,8 @@ from nba_api.stats.endpoints import teamyearbyyearstats
 from idGetter import get_player_id, get_team_id
 import os 
 import pandas as pd 
-
+import datetime
+import re
 conference_map = {
     1610612737: 'East',   # Atlanta Hawks
     1610612738: 'East',   # Boston Celtics
@@ -148,30 +149,40 @@ for p in all_players:
 def year_to_season(year):
     return f"{year - 1}-{str(year)[-2:]}"
 
-
 stats_df = pd.read_csv(os.path.join(path, 'NBA Player Stats and Salaries_2010-2025.csv'))
+
+
+def normalize_name(name):
+    return re.sub(r'[^a-z0-9\s]' , '' , name.lower()).strip()
+
 
 
 player_id_map = {}
 
-
-
 cur.execute("SELECT id, full_name FROM players")
 for row in cur.fetchall():
-    player_id_map[row[1]] = row[0]
+    normalized_player_name = normalize_name(row[1])
+    player_id_map[normalized_player_name] = row[0]
 
 stats_df['Season'] = stats_df['Year'].apply(year_to_season)
 stats_df = stats_df[['Player' , 'Season' , 'PTS' , 'TRB' , 'AST','STL' , 'BLK' ,'TOV' ,'MP', 'FG%', '3P%']]
 stats_df= stats_df.dropna()
 stats_data = []
 
+
+
+
+
+
+
 for _,row in stats_df.iterrows():
     name = row['Player']
     
-    if name not in player_id_map: 
-        continue
+    normalized_name = normalize_name(name)
     
-    player_id = player_id_map[name]
+    if normalize_name not in player_id_map:
+        continue
+    player_id = player_id_map[normalize_name]
     stats_data.append((
     player_id, 
         row["Season"], 
@@ -194,41 +205,50 @@ cur.executemany("""
                 """ ,stats_data)
 
 
-contracts_csv_path = "/Users/firasnazar/Main Library/Coding/Projects/nba_assets/nba_top_100_contracts.csv"
+contracts_csv_path = "/Users/firasnazar/Main Library/Coding/Projects/nba_assets/NBA Contracts.csv"
 contracts_df = pd.read_csv(contracts_csv_path)
 
-contracts_df['Average Annual Salary'] = (
-    contracts_df['Average Annual Salary']
+contracts_df['AAV'] = (
+    contracts_df['AAV']
     .replace('[\$,]', '', regex=True)  
     .astype(float)
     .fillna(0)                         
     .astype(int)
 )
-contracts_df['Contract Salary']= (
-    contracts_df['Contract Salary']
+contracts_df['Value']= (
+    contracts_df['Value']
     .replace('[\$,]', '', regex=True)
     .astype(float)
     .fillna(0)
     .astype(int)
 )
 
+current_year = datetime.datetime.now().year
 contracts_data =[]
 for _, row in contracts_df.iterrows():
-    player_name = row['Player Name']
+    player_name = row['Player']
 
-    if player_name not in player_id_map:
+    normalized_player_name_csv = normalize_name(player_name)
+
+    if normalized_player_name_csv not in player_id_map:
+        print(f"Skipping player '{player_name}' from CSV: Name not found in NBA API player list.")
         continue
     
-    player_id = player_id_map[player_name]
+    player_id = player_id_map[normalized_player_name_csv]
+
+    
+    contract_end_year = int(row['End'])
+    years_remaining = max(0,contract_end_year - current_year)
     contracts_data.append((
         player_id,
         player_name,
-        row['Average Annual Salary'],
-        row['Contract Salary'],
-        row['Contract Start Year'],
-        row['Contract End Year'],
-        row['Contract Duration'],
-        row.get('Years Remaining', 0)  
+        row['AAV'],
+        row['Value'],
+        row['Start'],
+        row['End'],
+        row['Yrs'],
+        years_remaining
+        #row.get('Years Remaining', 0)  
     )
     )
 
@@ -239,7 +259,6 @@ cur.executemany("""
 """, contracts_data)
 
 
-contracts_df['Years Remaining'] = contracts_df['Contract Duration'].fillna(0).astype(int)   
 
 
 
